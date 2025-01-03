@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = {
   target: 'node',
@@ -41,9 +40,4 @@ module.exports = {
   stats: {
     errorDetails: true
   },
-  plugins: [
-    new webpack.IgnorePlugin({
-      resourceRegExp: /express/,
-    })
-  ]
 };
