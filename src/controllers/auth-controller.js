@@ -30,58 +30,58 @@ exports.login = async (req, res, next) => {
 
     const hashUsername = encodeStringToHex(username)
 
-    await connectSqlServer();
+    // await connectSqlServer();
 
-    const responese = await sql.query `SELECT RTRIM([ofctitle]) + ' ' + RTRIM([ofcfname]) + ' ' + RTRIM([ofclname]) AS fullname, 
-    RTRIM(officer.ofctitle) AS prefix, RTRIM(officer.ofcfname) AS fname, RTRIM(officer.ofclname) AS lname, 
-    RTRIM(officer.ofcgroup) AS officeCode, RTRIM(officergroup.ofcgtyp) AS officeName, officer.OFCGR AS position 
-    FROM officer 
-    INNER JOIN UserProfile ON officer.ofcid = UserProfile.OficeID 
-    INNER JOIN officergroup ON officer.ofcgroup = officergroup.ofcgid
-    WHERE RUsername = ${hashUsername} AND RPassword = ${hashPassword} AND officergroup.ofcgtyp like 'พัสดุ%'`
+    // const responese = await sql.query `SELECT RTRIM([ofctitle]) + ' ' + RTRIM([ofcfname]) + ' ' + RTRIM([ofclname]) AS fullname, 
+    // RTRIM(officer.ofctitle) AS prefix, RTRIM(officer.ofcfname) AS fname, RTRIM(officer.ofclname) AS lname, 
+    // RTRIM(officer.ofcgroup) AS officeCode, RTRIM(officergroup.ofcgtyp) AS officeName, officer.OFCGR AS position 
+    // FROM officer 
+    // INNER JOIN UserProfile ON officer.ofcid = UserProfile.OficeID 
+    // INNER JOIN officergroup ON officer.ofcgroup = officergroup.ofcgid
+    // WHERE RUsername = ${hashUsername} AND RPassword = ${hashPassword} AND officergroup.ofcgtyp like 'พัสดุ%'`
 
-    await closeConnection();
+    // await closeConnection();
 
-    if(responese.rowsAffected[0] === 0) {
-        return next(createError(400, "ไม่พบผู้ใช้งานในระบบ"))
-    }
+    // if(responese.rowsAffected[0] === 0) {
+    //     return next(createError(400, "ไม่พบผู้ใช้งานในระบบ"))
+    // }
 
-    // fs.readFile('login.json', 'utf8', (err, data) => {
-    //   if (err) {
-    //     return createError(500, "Error reading users file")
-    //   }
+    fs.readFile('login.json', 'utf8', (err, data) => {
+      if (err) {
+        return createError(500, "Error reading users file")
+      }
   
-    //   const users = JSON.parse(data);
-    //   const response = users.find(user => user.username === hashUsername && user.password === hashPassword);
+      const users = JSON.parse(data);
+      const response = users.find(user => user.username === hashUsername && user.password === hashPassword);
 
-    //   if(!response){
-    //     return createError(400, "ไม่พบผูใช้งานในระบบ")
-    //   }
+      if(!response){
+        return createError(400, "ไม่พบผูใช้งานในระบบ")
+      }
 
-    //   const { username, password, ...userData} = response;
-    //   if (userData) {
-    //     const token = jwt.sign(
-    //       { data: [userData] }, process.env.JWT_SECRET, {
-    //           expiresIn: process.env.JWT_EXPIRES_IN
-    //       }
-    //   )
-    //     res.json({ message: "Login Success!" ,token})
-    //   } else {
-    //     return createError(401, "Invalid username or password")
-    //   }
-    // });
+      const { username, password, ...userData} = response;
+      if (userData) {
+        const token = jwt.sign(
+          { data: [userData] }, process.env.JWT_SECRET, {
+              expiresIn: process.env.JWT_EXPIRES_IN
+          }
+      )
+        res.json({ message: "Login Success!" ,token})
+      } else {
+        return createError(401, "Invalid username or password")
+      }
+    });
 
-    // remove 1 record
-    const {recordsets, ...data_api} = responese
+    // // remove 1 record
+    // const {recordsets, ...data_api} = responese
 
-    // generate token
-    const token = jwt.sign(
-        { data: data_api.recordset }, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN
-        }
-    )
+    // // generate token
+    // const token = jwt.sign(
+    //     { data: data_api.recordset }, process.env.JWT_SECRET, {
+    //         expiresIn: process.env.JWT_EXPIRES_IN
+    //     }
+    // )
 
-    res.json({ message: "Login Success!" ,token})
+    // res.json({ message: "Login Success!" ,token})
 
   } catch (err) {
     next(err);

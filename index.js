@@ -15,7 +15,7 @@ const errorHandler = require('./src/middlewares/error');
 const notFoundHandler = require('./src/middlewares/notFound');
 const diskRoute = require('./src/routes/disk-route');
 
-web.use(cors())
+web.use(cors("*"))
 web.use(express.json())
 
 web.use('/api', authRoute)
